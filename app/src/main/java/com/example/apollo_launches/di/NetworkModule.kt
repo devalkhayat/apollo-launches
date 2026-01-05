@@ -1,7 +1,8 @@
 package com.example.apollo_launches.di
 
-import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.network.okHttpClient
+
+import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.network.okHttpClient
 import com.example.apollo_launches.data.network.GraphQLService
 import dagger.Module
 import dagger.Provides

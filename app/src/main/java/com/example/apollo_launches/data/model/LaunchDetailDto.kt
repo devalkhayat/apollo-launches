@@ -7,5 +7,16 @@ data class LaunchDetailDto(
     val rocket: RocketDetailDto
 )
 
+data class MissionDetailDto(
+    val name: String?,
+    val missionPatch: String? // LARGE size
+)
+
+data class RocketDetailDto(
+    val id: String,
+    val name: String,
+    val type: String
+)
+
 
 

@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">apollo-launches</string>
+    <string name="switch_theme">Switch Theme</string>
+    <string name="switch_language">Switch Language</string>
+    <string name="hello_world">language is En</string>
+    <string name="space_launches">Space Launches</string>
+    <string name="launches_loaded_count">You have %1$d launches loaded</string>
+    <string name="details_title">Launch Details ( id : %1$s ) </string>
+    <string name="rocket_title">Rocket:</string>
+    <string name="rocket_name">Name</string>
+    <string name="rocket_type">Type</string>
+    <string name="rocket_id">ID</string>
+    <string name="mission_title">Mission:</string>
+    <string name="mission_name">Name</string>
+    <string name="site_title">Site:</string>
+    <string name="retry">Retry</string>
+    <string name="back">Back</string>
+
 </resources>

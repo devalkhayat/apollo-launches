@@ -1,16 +1,17 @@
-query GetLaunches($pageSize: Int!, $after: String) {
+
+query GetLaunches($pageSize: Int, $after: String) {
     launches(pageSize: $pageSize, after: $after) {
-        cursor        # Cursor of the last item in this page
-        hasMore       # Whether there are more launches
         launches {
             id
             mission {
                 name
-                missionPatch(size: SMALL)
+                missionPatch(size: SMALL) # <-- add this line
             }
             rocket {
                 name
             }
         }
+        cursor
+        hasMore
     }
 }

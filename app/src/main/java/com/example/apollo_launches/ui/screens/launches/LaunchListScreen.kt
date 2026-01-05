@@ -1,229 +1,125 @@
 package com.example.apollo_launches.ui.screens.launches
 
-
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import com.example.apollo_launches.R
-import com.example.apollo_launches.domain.model.LaunchSummary
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.apollo_launches.domain.model.Launch
+
+import com.example.apollo_launches.ui.components.LaunchItem
+
+import com.example.apollo_launches.ui.components.ThemeToggleButton
+import com.example.apollo_launches.ui.theme.ThemeViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.example.apollo_launches.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LaunchListScreen(
-    viewModel: LaunchListViewModel,
+    viewModel: LaunchViewModel = hiltViewModel(),
+    themeViewModel: ThemeViewModel,
     onLaunchClick: (String) -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val currentTheme by themeViewModel.theme.collectAsState()
+    val lazyPagingItems = viewModel.launchesPagingFlow.collectAsLazyPagingItems()
 
-    LaunchedEffect(Unit) {
-        viewModel.handleIntent(LaunchListIntent.LoadLaunches)
-    }
+    // TopAppBar scroll behavior
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                title = { Text( stringResource(
+                    id = R.string.space_launches
 
-        when {
-            state.isLoading && state.launches.isEmpty() -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            state.error != null && state.launches.isEmpty() -> {
-                ErrorView(
-                    message = state.error,
-                    onRetry = {
-                        viewModel.handleIntent(LaunchListIntent.LoadLaunches)
-                    }
-                )
-            }
-
-            else -> {
-                LaunchListContent(
-                    launches = state.launches,
-                    hasMore = state.hasMore,
-                    onLaunchClick = onLaunchClick,
-                    onLoadMore = {
-                        viewModel.handleIntent(
-                            LaunchListIntent.LoadNextPage(pageSize = 20)
-                        )
-                    }
-                )
-            }
-        }
-
-        if (state.isLoading && state.launches.isNotEmpty()) {
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth()
+                )) },
+                scrollBehavior = scrollBehavior
             )
-        }
-    }
-}
-@Composable
-private fun LaunchListContent(
-    launches: List<LaunchSummary>,
-    hasMore: Boolean,
-    onLaunchClick: (String) -> Unit,
-    onLoadMore: () -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        itemsIndexed(
-            items = launches,
-            key = { _, item -> item.id }
-        ) { index, launch ->
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
 
-            LaunchItem(
-                launch = launch,
-                onClick = {
-                    onLaunchClick(launch.id)
-                }
-            )
+            Row(modifier = Modifier.fillMaxWidth()){
+                ThemeToggleButton(themeViewModel)
 
-            // Trigger pagination near bottom
-            if (hasMore && index == launches.lastIndex - 2) {
-                LaunchedEffect(Unit) {
-                    onLoadMore()
-                }
-            }
-        }
-
-        if (hasMore) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        }
-    }
-}
-@Composable
-private fun LaunchItem(
-    launch: LaunchSummary,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            // ✅ Mission patch image
-            AsyncImage(
-                model = launch.missionPatch ,
-                contentDescription = launch.missionName ,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp)) ,
-                contentScale = ContentScale.Crop ,
-                placeholder = painterResource(R.drawable.ic_placeholder) ,
-                error = painterResource(R.drawable.ic_placeholder)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-
-                launch.missionName?.let {
+                // Show loaded count
+                val loadedItemCount = lazyPagingItems.itemCount
+                if (loadedItemCount > 0) {
                     Text(
-                        text = it,
-                        style = MaterialTheme.typography.titleMedium
+                        text = stringResource(
+                            id = R.string.launches_loaded_count,
+                            loadedItemCount
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = "Launch ID: ${launch.id}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
 
-                Spacer(modifier = Modifier.height(4.dp))
+            // Launch list
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(lazyPagingItems.itemCount) { index ->
+                    val launch = lazyPagingItems[index]
+                    launch?.let {
+                        LaunchItem(
+                            launch = it,
+                            onClick = { onLaunchClick(it.id) }
+                        )
+                    }
+                }
 
-                Text(
-                    text = launch.rocketName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Bottom loading indicator
+                lazyPagingItems.apply {
+                    when {
+                        loadState.append is androidx.paging.LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+
+                        loadState.append is androidx.paging.LoadState.Error -> {
+                            val e = lazyPagingItems.loadState.append as androidx.paging.LoadState.Error
+                            item {
+                                Text(
+                                    text = "Error: ${e.error.localizedMessage ?: "Unknown"}",
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-
-
-@Composable
-fun ErrorView(
-    message: String?,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Text(
-            text = message ?: "Something went wrong",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
-    }
-}
 
 
 

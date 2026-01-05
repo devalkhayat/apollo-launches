@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">apollo-launches</string>
+    <string name="switch_theme">تغيير الوضع</string>
+    <string name="switch_language">تغيير اللغة</string>
+    <string name="hello_world">اللغه الان عربي</string>
+    <string name="space_launches">رحلات الفضاء</string>
+    <string name="launches_loaded_count">تم تحميل %1$d رحله</string>
+    <string name="details_title">تفاصيل الرحله ( كود: %1$s )</string>
+    <string name="rocket_title">الصاروخ :</string>
+    <string name="rocket_name">الإسم</string>
+    <string name="rocket_type">النوع</string>
+    <string name="rocket_id">الكود</string>
+    <string name="mission_title">المهمه :</string>
+    <string name="mission_name">الإسم</string>
+    <string name="site_title">الموقع :</string>
+    <string name="retry">إعادة المحاوله</string>
+    <string name="back">رجوع</string>
+
 </resources>

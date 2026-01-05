@@ -1,7 +1,7 @@
 [versions]
 agp = "8.13.2"
 kotlin = "2.3.0"
-kotlinMetadataJvmVersion = "2.1.21"
+kotlinMetadataJvm = "2.3.0-Beta1"
 ksp = "2.3.0"
 hiltAndroid = "2.57.2"
 
@@ -13,13 +13,16 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2025.12.01"
 nav_version = "2.9.6"
-apollo="4.3.3"
+apollo="3.8.6"
 hilt_navigation_compose="1.3.0"
 viewModelVersion="2.10.0"
 serialization="1.9.0"
 serialization_blugin="2.3.0"
 accompanist-swipe-refresh-version="0.36.0"
 coil="2.7.0"
+paging = "3.2.0"
+material3Version = "1.4.0"
+uiVersion = "1.10.0"
 
 
 [libraries]
@@ -43,7 +46,8 @@ accompanist-swipe-refresh = { group = "com.google.accompanist", name = "accompan
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 #apollo
-apollo-runtime ={module ="com.apollographql.apollo:apollo-runtime", version.ref="apollo"}
+apollo-runtime ={module ="com.apollographql.apollo3:apollo-runtime", version.ref="apollo"}
+apollo-api ={module ="com.apollographql.apollo3:apollo-api", version.ref="apollo"}
 
 #Dagger-Hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -51,18 +55,26 @@ hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.re
 hilt-navigation-compose={group="androidx.hilt",name="hilt-navigation-compose" ,version.ref="hilt_navigation_compose"}
 
 #Navigtion
-kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlinMetadataJvmVersion" }
+kotlin-metadata-jvm-v230beta1 = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlinMetadataJvm" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "nav_version" }
 kotlinx-serialization={group="org.jetbrains.kotlinx",name="kotlinx-serialization-json",version.ref="serialization"}
 
+#Paging
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+
 lifecycle-viewmodel={group="androidx.lifecycle",name="lifecycle-viewmodel-compose",version.ref="viewModelVersion"}
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "uiVersion" }
+
+material-icons={module="androidx.compose.material:material-icons-extended"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-apollo={id="com.apollographql.apollo", version.ref="apollo" }
+apollo={id="com.apollographql.apollo3", version.ref="apollo" }
 kotlin-serialization={id="org.jetbrains.kotlin.plugin.serialization",version.ref="serialization_blugin"}
 android-hilt={id="com.google.dagger.hilt.android",version.ref="hiltAndroid"}
 

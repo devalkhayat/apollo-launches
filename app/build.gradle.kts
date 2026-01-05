@@ -4,12 +4,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.apollo)
+
 
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp )
     alias(libs.plugins.android.hilt)
 
+    alias (libs.plugins.apollo)
 
     id("kotlin-parcelize")
 
@@ -76,6 +77,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -86,7 +89,7 @@ dependencies {
 
     //apollo
     implementation(libs.apollo.runtime)
-
+    implementation(libs.apollo.api)
     //dagger
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
@@ -101,6 +104,10 @@ dependencies {
     implementation(libs.accompanist.swipe.refresh)
     implementation(libs.coil)
 
-    //implementation(libs.kotlin.metadata.jvm)
-    ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0-Beta1")
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    implementation(libs.material.icons)
+
+    ksp(libs.kotlin.metadata.jvm.v230beta1)
 }

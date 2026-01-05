@@ -12,7 +12,8 @@ import com.example.apollo_launches.ui.screens.details.LaunchDetailScreen
 import com.example.apollo_launches.ui.screens.details.LaunchDetailViewModel
 
 import com.example.apollo_launches.ui.screens.launches.LaunchListScreen
-import com.example.apollo_launches.ui.screens.launches.LaunchListViewModel
+import com.example.apollo_launches.ui.screens.launches.LaunchViewModel
+import com.example.apollo_launches.ui.theme.ThemeViewModel
 
 
 sealed class Screen(val route: String) {
@@ -23,7 +24,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavGraph(navController: NavHostController,modifier: Modifier = Modifier) {
+fun AppNavGraph(navController: NavHostController,modifier: Modifier = Modifier,themeViewModel: ThemeViewModel) {
     NavHost(
         navController = navController,
         startDestination = Screen.LaunchList.route,
@@ -31,10 +32,11 @@ fun AppNavGraph(navController: NavHostController,modifier: Modifier = Modifier) 
     ) {
 
         composable(Screen.LaunchList.route) {
-            val viewModel: LaunchListViewModel = hiltViewModel()
+            val viewModel: LaunchViewModel = hiltViewModel()
 
             LaunchListScreen(
                 viewModel = viewModel ,
+                themeViewModel = themeViewModel,
                 onLaunchClick = { launchId ->
                     navController.navigate(
                         Screen.LaunchDetail.createRoute(launchId)
@@ -60,7 +62,8 @@ fun AppNavGraph(navController: NavHostController,modifier: Modifier = Modifier) 
 
             LaunchDetailScreen(
                 launchId = launchId,
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }

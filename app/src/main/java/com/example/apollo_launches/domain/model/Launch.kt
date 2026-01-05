@@ -1,9 +1,10 @@
 package com.example.apollo_launches.domain.model
 
-data class LaunchSummary(
+data class Launch(
     val id: String,
     val missionName: String?,
-    val missionPatch: String?,   // SMALL patch
-    val rocketName: String
+    val missionPatchUrl: String?,
+    val rocketName: String?,
+
 )
 
