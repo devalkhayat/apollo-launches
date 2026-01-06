@@ -15,5 +15,6 @@
     <string name="site_title">Site:</string>
     <string name="retry">Retry</string>
     <string name="back">Back</string>
+    <string name="loading_launches">loading</string>
 
 </resources>

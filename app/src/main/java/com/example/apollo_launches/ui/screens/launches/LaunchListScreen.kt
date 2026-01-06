@@ -26,24 +26,66 @@ fun LaunchListScreen(
     onLaunchClick: (String) -> Unit
 ) {
 
+    val state by viewModel.state.collectAsState()
     val lazyPagingItems = viewModel.launchesPagingFlow.collectAsLazyPagingItems()
 
-    // TopAppBar scroll behavior
+    // Send ScreenOpened intent once
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(LaunchIntent.ScreenOpened)
+    }
+
+    // Observe paging state and notify ViewModel (MVI)
+    LaunchedEffect(lazyPagingItems.loadState) {
+        when {
+            lazyPagingItems.loadState.refresh is androidx.paging.LoadState.Loading -> {
+                viewModel.onIntent(LaunchIntent.ScreenOpened)
+            }
+
+            lazyPagingItems.loadState.refresh is androidx.paging.LoadState.NotLoading -> {
+                viewModel.onPagingLoaded()
+            }
+
+            lazyPagingItems.loadState.refresh is androidx.paging.LoadState.Error -> {
+                val error =
+                    (lazyPagingItems.loadState.refresh as androidx.paging.LoadState.Error)
+                viewModel.onPagingError(
+                    error.error.localizedMessage ?: "Unknown error"
+                )
+            }
+        }
+    }
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { ScreenAppBar(scrollBehavior) },
-        ) { paddingValues ->
+        topBar = { ScreenAppBar(scrollBehavior) }
+    ) { paddingValues ->
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
 
-        Column(modifier = Modifier.padding(paddingValues)) {
+            SummarySection(
+                themeViewModel = themeViewModel,
+                lazyPagingItems = lazyPagingItems,
+                isLoading = state.isLoading
+            )
 
-            SummarySection(themeViewModel,lazyPagingItems)
+            state.errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
 
-            LaunchesSection(lazyPagingItems,onLaunchClick)
-
-
+            LaunchesSection(
+                lazyPagingItems = lazyPagingItems,
+                onLaunchClick = onLaunchClick
+            )
         }
     }
 }
@@ -65,23 +107,35 @@ fun ScreenAppBar(scrollBehavior: TopAppBarScrollBehavior){
 }
 
 @Composable
-fun SummarySection(themeViewModel: ThemeViewModel,lazyPagingItems: LazyPagingItems<Launch>){
+fun SummarySection(
+    themeViewModel: ThemeViewModel,
+    lazyPagingItems: LazyPagingItems<Launch>,
+    isLoading: Boolean
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
 
-    Row(modifier = Modifier.fillMaxWidth()){
-        ThemeToggleButton(themeViewModel)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ThemeToggleButton(themeViewModel)
+        }
 
-        // Show loaded count
+        if (isLoading) {
+            Text(
+                text = stringResource(R.string.loading_launches),
+                modifier = Modifier.padding(8.dp)
+            )
+        }
 
         val loadedItemCount = lazyPagingItems.itemCount
         if (loadedItemCount > 0) {
             Text(
                 text = stringResource(
-                    id = R.string.launches_loaded_count,
+                    R.string.launches_loaded_count,
                     loadedItemCount
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.padding(8.dp),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -105,10 +159,9 @@ fun LaunchesSection(lazyPagingItems: LazyPagingItems<Launch>,onLaunchClick: (Str
             }
         }
 
-        // Bottom loading indicator
         lazyPagingItems.apply {
-            when {
-                loadState.append is androidx.paging.LoadState.Loading -> {
+            when (loadState.append) {
+                is androidx.paging.LoadState.Loading -> {
                     item {
                         Box(
                             modifier = Modifier
@@ -121,16 +174,18 @@ fun LaunchesSection(lazyPagingItems: LazyPagingItems<Launch>,onLaunchClick: (Str
                     }
                 }
 
-                loadState.append is androidx.paging.LoadState.Error -> {
-                    val e = lazyPagingItems.loadState.append as androidx.paging.LoadState.Error
+                is androidx.paging.LoadState.Error -> {
+                    val error = loadState.append as androidx.paging.LoadState.Error
                     item {
                         Text(
-                            text = "Error: ${e.error.localizedMessage ?: "Unknown"}",
+                            text = error.error.localizedMessage ?: "Error loading more",
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
+
+                else -> Unit
             }
         }
     }

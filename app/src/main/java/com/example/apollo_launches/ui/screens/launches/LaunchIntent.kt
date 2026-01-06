@@ -1,7 +1,8 @@
 package com.example.apollo_launches.ui.screens.launches
 
 
-sealed class LaunchIntent {
-    object LoadLaunches : LaunchIntent()          // Load first page
-    object RefreshLaunches : LaunchIntent()       // Pull-to-refresh
+sealed interface LaunchIntent {
+    data object ScreenOpened : LaunchIntent
+    data object Retry : LaunchIntent
+    data object Refresh : LaunchIntent
 }

@@ -15,5 +15,6 @@
     <string name="site_title">الموقع :</string>
     <string name="retry">إعادة المحاوله</string>
     <string name="back">رجوع</string>
+    <string name="loading_launches">جاري التحميل</string>
 
 </resources>

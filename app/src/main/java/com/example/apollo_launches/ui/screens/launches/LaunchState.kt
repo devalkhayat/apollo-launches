@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 
 data class LaunchState(
-    val launchesPagingData: Flow<PagingData<Launch>>? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

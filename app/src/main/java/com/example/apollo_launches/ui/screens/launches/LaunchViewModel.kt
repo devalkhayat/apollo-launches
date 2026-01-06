@@ -17,26 +17,44 @@ class LaunchViewModel @Inject constructor(
     private val getLaunchesPageUseCase: GetLaunchesPageUseCase
 ) : ViewModel() {
 
-    // Expose directly the PagingData as state
+    // Paging flow (data stream)
     val launchesPagingFlow: Flow<PagingData<Launch>> =
         getLaunchesPageUseCase()
-            .cachedIn(viewModelScope)  // cache PagingData in ViewModel scope
+            .cachedIn(viewModelScope)
 
-    private val _state = MutableStateFlow(LaunchState(isLoading = true))
+    // MVI state
+    private val _state = MutableStateFlow(LaunchState())
     val state: StateFlow<LaunchState> = _state.asStateFlow()
 
-   /*fun handleIntent(intent: LaunchIntent) {
+    fun onIntent(intent: LaunchIntent) {
         when (intent) {
-            is LaunchIntent.LoadLaunches -> {
-                // no need to assign flow again; just update loading state
-                _state.update { it.copy(isLoading = true, errorMessage = null) }
-            }
-            is LaunchIntent.RefreshLaunches -> {
-                _state.update { it.copy(isLoading = true, errorMessage = null) }
+            LaunchIntent.ScreenOpened -> {
+                _state.update {
+                    it.copy(isLoading = true, errorMessage = null)
+                }
             }
 
+            LaunchIntent.Retry -> {
+                _state.update {
+                    it.copy(isLoading = true, errorMessage = null)
+                }
+            }
 
-
+            LaunchIntent.Refresh -> {
+                _state.update {
+                    it.copy(isLoading = true, errorMessage = null)
+                }
+            }
         }
-    }*/
+    }
+
+    fun onPagingLoaded() {
+        _state.update { it.copy(isLoading = false) }
+    }
+
+    fun onPagingError(message: String) {
+        _state.update {
+            it.copy(isLoading = false, errorMessage = message)
+        }
+    }
 }
